@@ -9,7 +9,14 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-          config.allowAliases = false;
+          config = {
+            allowAliases = false;
+            allowUnfree = true;
+            allowBroken = true;
+            allowUnsupportedSystem = true;
+            allowInsecurePredicate = (pkg: true);
+            android_sdk.accept_license = true;
+          };
         };
         lib = pkgs.lib;
 
@@ -40,7 +47,7 @@
         goPkgsList = lib.concatStringsSep "\n" goPkgsSources;
         goPkgsListFile = pkgs.writeText "goPkgsList" goPkgsList;
 
-        govulncheck-nixpkgs = pkgs.writeShellApplication {
+        govulncheck-go-srouces = pkgs.writeShellApplication {
           name = "govulncheck-nixpkgs";
           runtimeInputs = with pkgs; [ govulncheck go ];
           text = ''
@@ -55,6 +62,34 @@
             exit $exitcode
           '';
         };
+
+        govulncheck-pkg = name: pkg: (pkg.overrideAttrs (oldAttrs: {
+          nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.govulncheck ];
+          buildPhase = ''
+            runHook preBuild
+
+            mkdir -p $out
+            if ! govulncheck -db file://${govulndb} ./... | tee ${name}.report; then
+              mv ${name}.report $out/${name}.report
+            fi
+
+            if [[ -n $man ]]; then
+              mkdir -p $man
+            fi
+
+            runHook postBuild
+          '';
+          doCheck = false;
+          dontInstall = true;
+          doInstallCheck = false;
+          dontFixup = true;
+          doDist = false;
+        }));
+
+        govulncheck-nixpkgs = pkgs.symlinkJoin {
+          name = "govulncheck-nixpkgs";
+          paths = lib.mapAttrsToList govulncheck-pkg goPkgs;
+        };
       in
       {
         packages = {
@@ -63,6 +98,8 @@
             govulndb
             goPkgsList
             goPkgsListFile
+            govulncheck-go-srouces
+            govulncheck-pkg
             govulncheck-nixpkgs
             ;
           uplosi = pkgs.uplosi;
