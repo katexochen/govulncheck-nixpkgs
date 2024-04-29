@@ -73,9 +73,9 @@
               mv ${name}.report $out/${name}.report
             fi
 
-            if [[ -n $man ]]; then
-              mkdir -p $man
-            fi
+            for output in $man $wordlists $bin $dev $testing_infra; do
+              mkdir -p $output
+            done
 
             runHook postBuild
           '';
