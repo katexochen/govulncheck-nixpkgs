@@ -34,13 +34,13 @@
           && lib.hasAttr "go" pkg
           && lib.hasAttr "goModules" pkg
         );
+
         goPkgs = lib.filterAttrs isGoPkg pkgs;
-        goPkgsNames = builtins.toString (lib.attrNames goPkgs);
         goPkgsSources = lib.mapAttrsToList (name: pkg: (lib.concatStringsSep " " [ name pkg.src ])) goPkgs;
         goPkgsList = lib.concatStringsSep "\n" goPkgsSources;
         goPkgsListFile = pkgs.writeText "goPkgsList" goPkgsList;
 
-        govulncheck-nixpkgs = pkgs.writeShellApplication {
+        govulncheck-go-sources = pkgs.writeShellApplication {
           name = "govulncheck-nixpkgs";
           runtimeInputs = with pkgs; [ govulncheck go ];
           text = ''
@@ -61,12 +61,9 @@
           inherit
             govulncheck-script
             govulndb
-            goPkgsList
             goPkgsListFile
-            govulncheck-nixpkgs
+            govulncheck-go-sources
             ;
-          uplosi = pkgs.uplosi;
-          hello = pkgs.hello;
         };
       });
 }
