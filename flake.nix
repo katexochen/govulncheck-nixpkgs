@@ -15,9 +15,9 @@
 
         govulndb = pkgs.fetchzip {
           pname = "govulndb";
-          version = "0-unstable-2023-04-22";
+          version = "0-unstable-2024-05-14";
           url = "https://vuln.go.dev/vulndb.zip";
-          hash = "sha256-BUxmq57f5/wkMnZ2am9IS5KFVGpY2CtuqAz9IcOIBxc=";
+          hash = "sha256-oCNFLOp72XXvx8kM9umiZDeMcsC+bi2QibZ3eCD2nyM=";
           stripRoot = false;
         };
 
