@@ -77,6 +77,30 @@ case $cmd in
         )
         ;;
     *)
-        echo "Unknown command: $cmd"
+        cat <<EOF
+
+Usage: $0 <command> [args]
+
+Commands:
+    stats
+        Show statistics about the report.
+
+    list
+        List all packages checked and their vulnerabilities.
+
+    report <pkgName>
+        Show the report for a specific package.
+
+    findings <pkgName>
+        List the found vulnerabilities (URL) for a specific package.
+
+    mark <pkgName>
+        Show the vulnerabilities for a specific package in a format that can be
+        used to mark the package as vulnerable in the nixpkgs repository.
+
+    fix <pkgName>
+        Show the commands to fix the vulnerabilities upstream.
+
+EOF
         ;;
 esac
