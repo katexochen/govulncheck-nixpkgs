@@ -9,7 +9,21 @@
       let
         pkgs = import nixpkgs {
           inherit system;
+
+          # Prevent duplicated reports.
           config.allowAliases = false;
+
+          overlays = [
+            (final: prev: {
+              go_1_22 = prev.go_1_22.overrideAttrs (finalAttrs: _prevAttrs: {
+                version = "1.22.3";
+                src = final.fetchurl {
+                  url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
+                  hash = "sha256-gGSO80+QMZPXKlnA3/AZ9fmK4MmqE63gsOy/+ZGnb2g=";
+                };
+              });
+            })
+          ];
         };
         lib = pkgs.lib;
 
