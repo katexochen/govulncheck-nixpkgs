@@ -54,8 +54,8 @@
         goPkgsList = lib.concatStringsSep "\n" goPkgsSources;
         goPkgsListFile = pkgs.writeText "goPkgsList" goPkgsList;
 
-        govulncheck-go-sources = pkgs.writeShellApplication {
-          name = "govulncheck-nixpkgs";
+        govulncheck-srcs-script = pkgs.writeShellApplication {
+          name = "govulncheck-srcs.sh";
           runtimeInputs = with pkgs; [ govulncheck go ];
           text = ''
             exitcode=0
@@ -63,12 +63,19 @@
             while IFS= read -r line; do
               name=$(echo "$line" | cut -d ' ' -f 1)
               src=$(echo "$line" | cut -d ' ' -f 2)
-              echo "Checking nixpkg $name"
+              echo "Checking nixpkg $name" | tee /dev/stderr
               govulncheck -db file://${govulndb} -C "$src" ./... || exitcode=$?
             done < ${goPkgsListFile}
             exit $exitcode
           '';
         };
+
+        govulncheck-srcs = pkgs.runCommand "govulncheck-srcs"
+          { nativeBuildInputs = [ govulncheck-srcs-script ]; }
+          ''
+            export HOME=$TMPDIR
+            govulncheck-srcs.sh > $out
+          '';
 
         report-tool = pkgs.writeShellApplication {
           name = "report-tool";
@@ -86,9 +93,8 @@
       {
         packages = {
           inherit
-            goPkgsListFile
-            govulncheck-go-sources
             govulncheck-script
+            govulncheck-srcs
             govulndb
             report-tool
             ;
