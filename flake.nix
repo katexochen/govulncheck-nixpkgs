@@ -69,15 +69,35 @@
             exit $exitcode
           '';
         };
+
+        report-tool = pkgs.writeShellApplication {
+          name = "report-tool";
+          runtimeInputs = with pkgs; [
+            curl
+            gawk
+            gnugrep
+            gnused
+            jq
+            ripgrep
+          ];
+          text = builtins.readFile ./report-tool.sh;
+        };
       in
       {
         packages = {
           inherit
-            govulncheck-script
-            govulndb
             goPkgsListFile
             govulncheck-go-sources
+            govulncheck-script
+            govulndb
+            report-tool
             ;
+        };
+
+        devShells = {
+          default = pkgs.mkShell {
+            packages = [ report-tool ];
+          };
         };
       });
 }
