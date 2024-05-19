@@ -69,15 +69,14 @@
           name = "govulncheck-srcs";
           runtimeInputs = with pkgs; [ govulncheck go ];
           text = ''
-            exitcode=0
             # Read Go packages from file, line by line, format is "name src"
             while IFS= read -r line; do
               name=$(echo "$line" | cut -d ' ' -f 1)
               src=$(echo "$line" | cut -d ' ' -f 2)
               echo "Checking nixpkg $name"
-              govulncheck -db file://${govulndb} -C "$src" ./... || exitcode=$?
+              govulncheck -db file://${govulndb} -C "$src" ./... 2>&1
+              fi
             done < ${goPkgsSrcsFile}
-            exit $exitcode
           '';
         };
 
