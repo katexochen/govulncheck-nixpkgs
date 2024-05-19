@@ -15,6 +15,8 @@
 
           overlays = [
             (final: prev: {
+              # Ensure we are using the latest version of Go, or we will get
+              # many findings of vulnerable stdlib packages.
               go_1_22 = prev.go_1_22.overrideAttrs (finalAttrs: _prevAttrs: {
                 version = "1.22.3";
                 src = final.fetchurl {
@@ -27,6 +29,8 @@
         };
         lib = pkgs.lib;
 
+        # The Go vulnerability database.
+        # Version is based on the modivfied field of index/db.json in the archive.
         govulndb = pkgs.fetchzip {
           pname = "govulndb";
           version = "0-unstable-2024-05-14";
@@ -35,12 +39,17 @@
           stripRoot = false;
         };
 
+        # Helper script to govulncheck a module against the downloaded database.
         govulncheck-script = pkgs.writeShellApplication {
           name = "govulncheck-script";
           runtimeInputs = with pkgs; [ govulncheck go ];
           text = ''govulncheck -db file://${govulndb} -C "$@" ./...'';
         };
 
+        # Filter for Go packages based on some well known attributes buildGoModule will add.
+        # This is not precise and likely flawed. It doesn't handle nested package sets correctly.
+        # Number of packages found with this is close enought to the number of findings grepping
+        # nixpkgs for "buildGoModule", so it's good enough for now.
         isGoPkg = name: pkg: (
           (builtins.tryEval pkg).success
           && lib.isAttrs pkg
@@ -49,13 +58,15 @@
           && lib.hasAttr "goModules" pkg
         );
 
+        # Contruct a file mapping package name to src path.
         goPkgs = lib.filterAttrs isGoPkg pkgs;
-        goPkgsSources = lib.mapAttrsToList (name: pkg: (lib.concatStringsSep " " [ name pkg.src ])) goPkgs;
-        goPkgsList = lib.concatStringsSep "\n" goPkgsSources;
-        goPkgsListFile = pkgs.writeText "goPkgsList" goPkgsList;
+        goPkgsSrcs = lib.mapAttrsToList (name: pkg: (lib.concatStringsSep " " [ name pkg.src ])) goPkgs;
+        goPkgsSrcsFile = pkgs.writeText "goPkgsList" (lib.concatStringsSep "\n" goPkgsSrcs);
 
-        govulncheck-go-sources = pkgs.writeShellApplication {
-          name = "govulncheck-nixpkgs";
+        # Iterate over the list of Go package path srcs and run govulncheck on them.
+        # Run as 'nix run .#govulncheck-srcs |& tee report.txt'
+        govulncheck-srcs = pkgs.writeShellApplication {
+          name = "govulncheck-srcs";
           runtimeInputs = with pkgs; [ govulncheck go ];
           text = ''
             exitcode=0
@@ -65,11 +76,12 @@
               src=$(echo "$line" | cut -d ' ' -f 2)
               echo "Checking nixpkg $name"
               govulncheck -db file://${govulndb} -C "$src" ./... || exitcode=$?
-            done < ${goPkgsListFile}
+            done < ${goPkgsSrcsFile}
             exit $exitcode
           '';
         };
 
+        # Some bash to get something useful out of the govulncheck-srcs report.
         report-tool = pkgs.writeShellApplication {
           name = "report-tool";
           runtimeInputs = with pkgs; [
@@ -86,14 +98,12 @@
       {
         packages = {
           inherit
-            goPkgsListFile
-            govulncheck-go-sources
             govulncheck-script
+            govulncheck-srcs
             govulndb
             report-tool
             ;
         };
-
         devShells = {
           default = pkgs.mkShell {
             packages = [ report-tool ];
