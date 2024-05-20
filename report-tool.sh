@@ -24,20 +24,48 @@ function substituteWithCVEIfAvailable() {
 cmd=$1
 case $cmd in
     "stats")
-        pkgs=$(grep -c 'Checking nixpkg' report.txt)
-        vulns=$(grep -c 'Vulnerability #' report.txt)
-        vulnPkgs=$(
-            grep -E '(Checking nixpkg|Vulnerability #)' report.txt |
-            rg --multiline 'Checking nixpkg.*\n.*Vulnerability #' |
-            grep -c 'Checking nixpkg'
-        )
-        vulnPerc=$(( 100 * vulnPkgs / pkgs ))
-        echo "Packages checked:      $pkgs"
-        echo "Vulnerable packages:   $vulnPkgs ($vulnPerc%)"
+        discovered=$($0 discovered | wc -l)
+        failed=$($0 failed | wc -l)
+        scanned=$($0 scanned | wc -l)
+        vulnerable=$($0 vulnerable | wc -l)
+        nonvulnerable=$($0 non-vulnerable | wc -l)
+
+        # ensure failed + scanned = discovered
+        if [[ $discovered -ne $((failed + scanned)) ]]; then
+            echo -e "Error: $discovered (discovered) != $failed (failed) + $scanned (scanned)\n"
+        fi
+        # ensure scanned = vulnerable + non-vulnerable
+        if [[ $scanned -ne $((vulnerable + nonvulnerable)) ]]; then
+            echo -e "Error: $scanned (scanned) != $vulnerable (vulnerable) + $nonvulnerable (non-vulnerable)\n"
+        fi
+
+        vulns=$(rg -c 'Vulnerability #' report.txt)
+        echo "Packages discovered:   $discovered"
+        echo "Packages failed:       $failed ($(( 100 * failed / discovered ))%)"
+        echo "Packages scanned:      $scanned ($(( 100 * scanned / discovered ))%)"
+        echo "Packages vulnerable:   $vulnerable ($(( 100 * vulnerable / scanned ))% of scanned)"
         echo "Total vulnerabilities: $vulns"
        ;;
-    "list")
-        grep -E '(Checking nixpkg|Vulnerability #)' report.txt | less
+    "discovered")
+        rg -NI 'Checking nixpkg ([^\s]+)' -or '$1' report.txt
+        ;;
+    "failed")
+        rg -NI 'Checking nixpkg|govulncheck: (loading packages|no go.mod file)' report.txt |
+        rg --multiline 'Checking nixpkg ([^\s]+)\ngovulncheck' -or '$1'
+        ;;
+    "scanned")
+        rg -NI 'Checking nixpkg|Vulnerability #|govulncheck:' report.txt |
+        rg --multiline -v 'Checking nixpkg ([^\s]+)\ngovulncheck:' |
+        rg 'Checking nixpkg ([^\s]+)' -or '$1'
+        ;;
+    "vulnerable")
+        rg -NI 'Checking nixpkg|Vulnerability #' report.txt |
+        rg --multiline 'Checking nixpkg ([^\s]+)\n\s*Vulnerability #' -or '$1'
+        ;;
+    "non-vulnerable")
+        rg -NI 'Checking nixpkg|Vulnerability #|govulncheck:' report.txt |
+        rg --multiline -v 'Checking nixpkg [^\s]+\n(Vulnerability #|govulncheck:)' |
+        rg 'Checking nixpkg ([^\s]+)' -or '$1'
         ;;
     "report")
         pkgName=$2
@@ -85,8 +113,20 @@ Commands:
     stats
         Show statistics about the report.
 
-    list
-        List all packages checked and their vulnerabilities.
+    discovered
+        List packages which were tried to be checked.
+
+    failed
+        List packages for which the check failed.
+
+    scanned
+        List packages that were successfully scanned.
+
+    vulnerable
+        List packages that have vulnerabilities.
+
+    non-vulnerable
+        List packages that do not have vulnerabilities.
 
     report <pkgName>
         Show the report for a specific package.
