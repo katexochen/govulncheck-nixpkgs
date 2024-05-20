@@ -23,7 +23,7 @@ Total vulnerabilities: 1312
 - Primitive package discovery (see `isGoPkg`)
   - Only looking at package attributes to identify Go packages
   - Not recuring into nested attribute sets
-  - `rg -c 'buildGoModule (|rec )\{' | awk -F: '{s+=$2} END {print s}'` on nixpkgs gives 2048 findings,
+  - `rg -c 'buildGo\d*Module (|rec )\{' | awk -F: '{s+=$2} END {print s}` on nixpkgs gives 2063 findings,
     so the 2075 packages found by the heuristic might should at least be somewhat close
 - Checks are running directly on `src`
   - Patches not taken into account
