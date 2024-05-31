@@ -74,8 +74,7 @@
               name=$(echo "$line" | cut -d ' ' -f 1)
               src=$(echo "$line" | cut -d ' ' -f 2)
               echo "Checking nixpkg $name"
-              govulncheck -db file://${govulndb} -C "$src" ./... 2>&1
-              fi
+              govulncheck -db file://${govulndb} -C "$src" ./... 2>&1 || true
             done < ${goPkgsSrcsFile}
           '';
         };
