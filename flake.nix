@@ -33,9 +33,9 @@
         # Version is based on the modivfied field of index/db.json in the archive.
         govulndb = pkgs.fetchzip {
           pname = "govulndb";
-          version = "0-unstable-2024-05-14";
+          version = "0-unstable-2024-05-28";
           url = "https://vuln.go.dev/vulndb.zip";
-          hash = "sha256-oCNFLOp72XXvx8kM9umiZDeMcsC+bi2QibZ3eCD2nyM=";
+          hash = "sha256-F2SMCIwIUe+jKTV9m++LkobsYcwzs20FQIduoDET7tM=";
           stripRoot = false;
         };
 
