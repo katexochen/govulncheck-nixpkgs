@@ -26,12 +26,17 @@ Total vulnerabilities: 1247
   - `rg -c 'buildGo\d*Module (|rec )\{' | awk -F: '{s+=$2} END {print s}'` on nixpkgs gives 2074 findings,
     so the 2090 packages found by the heuristic might should at least be somewhat close
 - Checks are running directly on `src`
-  - Patches not taken into account
+  - `patches` not taken into account
   - `cgo` dependencies are not present (see `report-tool failed`)
   - `srcRoot`, `subPackages` etc not taken into account (some failures as `go.mod` is not found)
   - `goModules` isn't used by the govulncheck invocation
 - Scan is not running in the sandbox
 - All the [limitations of govulncheck](https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck#hdr-Limitations)
+- Only covers nixpkgs-unstable (support for releases upcoming)
+- Report lacks a structured format. I couldn't befriend with the JSONline output of govulncheck, it misses
+  some important info like scan failures, which won't be part of the structured output. The current report
+  can be somehow worked with using the report-tool. In the future, some kind of website would be nice to
+  present the results.
 
 
 ### `report-tool`
