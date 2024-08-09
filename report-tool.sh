@@ -21,7 +21,7 @@ function substituteWithCVEIfAvailable() {
     done
 }
 
-cmd=$1
+cmd=${1:-}
 case $cmd in
     "stats")
         discovered=$($0 discovered | wc -l)
