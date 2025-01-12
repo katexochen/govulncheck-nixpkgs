@@ -48,7 +48,7 @@
 
         # Filter for Go packages based on some well known attributes buildGoModule will add.
         # This is not precise and likely flawed. It doesn't handle nested package sets correctly.
-        # Number of packages found with this is close enought to the number of findings grepping
+        # Number of packages found with this is close enough to the number of findings grepping
         # nixpkgs for "buildGoModule", so it's good enough for now.
         isGoPkg = name: pkg: (
           (builtins.tryEval pkg).success
@@ -58,7 +58,7 @@
           && lib.hasAttr "goModules" pkg
         );
 
-        # Contruct a file mapping package name to src path.
+        # Construct a file mapping package name to src path.
         goPkgs = lib.filterAttrs isGoPkg pkgs;
         goPkgsSrcs = lib.mapAttrsToList (name: pkg: (lib.concatStringsSep " " [ name pkg.src ])) goPkgs;
         goPkgsSrcsFile = pkgs.writeText "goPkgsList" (lib.concatStringsSep "\n" goPkgsSrcs);
