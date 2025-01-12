@@ -30,12 +30,12 @@
         lib = pkgs.lib;
 
         # The Go vulnerability database.
-        # Version is based on the modivfied field of index/db.json in the archive.
+        # Version is based on the modified field of index/db.json in the archive.
         govulndb = pkgs.fetchzip {
           pname = "govulndb";
-          version = "0-unstable-2024-11-12";
+          version = "0-unstable-2025-01-09";
           url = "https://vuln.go.dev/vulndb.zip";
-          hash = "sha256-sCy2WZc7Vj22gCCUJIQq22CBCj7sTxipVDk7VRfNWQM=";
+          hash = "sha256-48/xrmeepEyaZm+EsNZjGDqhlmco5NHToxgR61MAgOg=";
           stripRoot = false;
         };
 
