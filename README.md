@@ -17,6 +17,10 @@ Packages scanned:      2000 (82%)
 Packages vulnerable:   643 (32% of scanned)
 Total vulnerabilities: 1997
 ```
+<p align="center">
+    <img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRmIRrf8Xs-gWjELNtujQAGxQInZseqpnculzfNtulc6pTzJPnFuIJA3n1UxVwXC0YiGD-rjpS6qcbc/pubchart?oid=956312454&format=image" />
+    <img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRmIRrf8Xs-gWjELNtujQAGxQInZseqpnculzfNtulc6pTzJPnFuIJA3n1UxVwXC0YiGD-rjpS6qcbc/pubchart?oid=1763072225&format=image" />
+</p>
 
 ### Current limitations
 
