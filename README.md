@@ -11,11 +11,11 @@ allows easy access to the relevant part of the report.
 
 ```
 ❯ report-tool stats
-Packages discovered:   2340
-Packages failed:       405 (17%)
-Packages scanned:      1935 (82%)
-Packages vulnerable:   543 (28% of scanned)
-Total vulnerabilities: 1751
+Packages discovered:   2422
+Packages failed:       422 (17%)
+Packages scanned:      2000 (82%)
+Packages vulnerable:   643 (32% of scanned)
+Total vulnerabilities: 1997
 ```
 
 ### Current limitations
@@ -23,8 +23,8 @@ Total vulnerabilities: 1751
 - Primitive package discovery (see `isGoPkg`)
   - Only looking at package attributes to identify Go packages
   - Not recursing into nested attribute sets
-  - `rg -c 'buildGo\d*Module (|rec )\{' | awk -F: '{s+=$2} END {print s}'` on nixpkgs gives 2074 findings,
-    so the 2090 packages found by the heuristic might should at least be somewhat close
+  - `rg -c 'buildGo\d*Module (|rec )\{' | awk -F: '{s+=$2} END {print s}'` on nixpkgs gives 2417 findings,
+    so the 2422 packages found by the heuristic might should at least be somewhat close
 - Checks are running directly on `src`
   - `patches` not taken into account
   - `cgo` dependencies are not present (see `report-tool failed`)
