@@ -31,12 +31,26 @@
 
         # The Go vulnerability database.
         # Version is based on the modified field of index/db.json in the archive.
-        govulndb = pkgs.fetchzip {
-          pname = "govulndb";
-          version = "0-unstable-2025-01-09";
-          url = "https://vuln.go.dev/vulndb.zip";
-          hash = "sha256-48/xrmeepEyaZm+EsNZjGDqhlmco5NHToxgR61MAgOg=";
-          stripRoot = false;
+        govulndb = pkgs.buildGoModule {
+          pname = "govuln";
+          version = "0-unstable-2025-01-17";
+
+          src = pkgs.fetchFromGitHub {
+            owner = "golang";
+            repo = "vulndb";
+            rev = "b808447b337382e2e3318c9e18e1f6ec45bd1b68";
+            leaveDotGit = true;
+            deepClone = true;
+            hash = "sha256-9saYqetG8eVAHfYc02CtrjCLsrOSoCFvPj4d30YkKaw=";
+          };
+
+          vendorHash = "sha256-u2h0zqZvbXFp+CxzZdeRn6ZNZGl1PwMzyqlZgVla0gk=";
+
+          subPackages = [ "cmd/gendb" ];
+
+          installPhase = ''
+            go run ./cmd/gendb -out $out
+          '';
         };
 
         # Helper script to govulncheck a module against the downloaded database.
