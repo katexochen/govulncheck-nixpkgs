@@ -126,6 +126,39 @@
           ];
           text = builtins.readFile ./report-tool.sh;
         };
+
+        # This tries to count the total number of module dependencies in nixpkgs.
+        # Main goal here is to get an expectation for the goPackages size of gobuild.nix.
+        go-modules-total =
+          pkgs.runCommand "go-count-modules-total"
+            {
+              buildInputs = with pkgs; [ go ];
+            }
+            ''
+              mkdir -p $out
+              tmpfile=$(mktemp)
+
+              while IFS= read -r line; do
+                src=$(echo "$line" | cut -d ' ' -f 2)
+                cat $src/go.mod >> $tmpfile || echo "$src" >> $out/not-included.txt
+              done < ${goPkgsSrcsFile}
+
+              cat $tmpfile |
+                sed -E 's/^[[:space:]]+//;s/[[:space:]]+$//' |
+                sed -E 's/[[:space:]]*\/\/ indirect$//' |
+                grep -v '^go' |
+                grep -v '^//' |
+                grep -v '^module' |
+                grep -v '^require (' |
+                grep -v '^replace' |
+                grep -v '^exclude' |
+                grep -v '^)$' |
+                grep -v '^retract' |
+                grep -v '^toolchain' |
+                grep -v '^v[0-9]\+\.[0-9]\+\.[0-9]\+' |
+                cut -d' ' -f1 |
+                sort -u > $out/modules.txt
+            '';
       in
       {
         packages = {
@@ -133,6 +166,7 @@
             govulncheck-script
             govulncheck-srcs
             govulndb
+            go-modules-total
             report-tool
             ;
         };
