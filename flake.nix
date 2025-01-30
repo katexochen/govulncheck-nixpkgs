@@ -4,8 +4,14 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs {
           inherit system;
@@ -56,7 +62,10 @@
         # Helper script to govulncheck a module against the downloaded database.
         govulncheck-script = pkgs.writeShellApplication {
           name = "govulncheck-script";
-          runtimeInputs = with pkgs; [ govulncheck go ];
+          runtimeInputs = with pkgs; [
+            govulncheck
+            go
+          ];
           text = ''govulncheck -db file://${govulndb} -C "$@" ./...'';
         };
 
@@ -64,24 +73,35 @@
         # This is not precise and likely flawed. It doesn't handle nested package sets correctly.
         # Number of packages found with this is close enough to the number of findings grepping
         # nixpkgs for "buildGoModule", so it's good enough for now.
-        isGoPkg = name: pkg: (
-          (builtins.tryEval pkg).success
-          && lib.isAttrs pkg
-          && lib.hasAttr "src" pkg
-          && lib.hasAttr "go" pkg
-          && lib.hasAttr "goModules" pkg
-        );
+        isGoPkg =
+          name: pkg:
+          (
+            (builtins.tryEval pkg).success
+            && lib.isAttrs pkg
+            && lib.hasAttr "src" pkg
+            && lib.hasAttr "go" pkg
+            && lib.hasAttr "goModules" pkg
+          );
 
         # Construct a file mapping package name to src path.
         goPkgs = lib.filterAttrs isGoPkg pkgs;
-        goPkgsSrcs = lib.mapAttrsToList (name: pkg: (lib.concatStringsSep " " [ name pkg.src ])) goPkgs;
+        goPkgsSrcs = lib.mapAttrsToList (
+          name: pkg:
+          (lib.concatStringsSep " " [
+            name
+            pkg.src
+          ])
+        ) goPkgs;
         goPkgsSrcsFile = pkgs.writeText "goPkgsList" (lib.concatStringsSep "\n" goPkgsSrcs);
 
         # Iterate over the list of Go package path srcs and run govulncheck on them.
         # Run as 'nix run .#govulncheck-srcs |& tee report.txt'
         govulncheck-srcs = pkgs.writeShellApplication {
           name = "govulncheck-srcs";
-          runtimeInputs = with pkgs; [ govulncheck go ];
+          runtimeInputs = with pkgs; [
+            govulncheck
+            go
+          ];
           text = ''
             # Read Go packages from file, line by line, format is "name src"
             while IFS= read -r line; do
@@ -121,5 +141,6 @@
             packages = [ report-tool ];
           };
         };
-      });
+      }
+    );
 }
