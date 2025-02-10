@@ -23,13 +23,15 @@
             (final: prev: {
               # Ensure we are using the latest version of Go, or we will get
               # many findings of vulnerable stdlib packages.
-              # go_1_22 = prev.go_1_22.overrideAttrs (finalAttrs: _prevAttrs: {
-              #   version = "1.22.3";
-              #   src = final.fetchurl {
-              #     url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
-              #     hash = "sha256-gGSO80+QMZPXKlnA3/AZ9fmK4MmqE63gsOy/+ZGnb2g=";
-              #   };
-              # });
+              go_1_23 = prev.go_1_23.overrideAttrs (
+                finalAttrs: _prevAttrs: {
+                  version = "1.23.6";
+                  src = final.fetchurl {
+                    url = "https://go.dev/dl/go${finalAttrs.version}.src.tar.gz";
+                    hash = "sha256-A5xbBOZSedrO7opvcecL0Fz1uAF4K293xuGeLtBREiI=";
+                  };
+                }
+              );
             })
           ];
         };
