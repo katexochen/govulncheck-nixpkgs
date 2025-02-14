@@ -41,18 +41,18 @@
         # Version is based on the modified field of index/db.json in the archive.
         govulndb = pkgs.buildGoModule {
           pname = "govuln";
-          version = "0-unstable-2025-02-07";
+          version = "0-unstable-2025-02-10";
 
           src = pkgs.fetchFromGitHub {
             owner = "golang";
             repo = "vulndb";
-            rev = "9e81317895889d3236d21af517f4ae5b9490f99c";
+            rev = "ceb546176e2871391168379e9409760ed6ce52d8";
             leaveDotGit = true;
             deepClone = true;
-            hash = "sha256-dpRjmHEc44aQrI2da1TFUR/hc3MSAUAEw8gF/H0CAiQ=";
+            hash = "sha256-cuH+uKm6/6nFVgszhgX/TV2sYvjX6pe3sPREBhnIlLs=";
           };
 
-          vendorHash = "sha256-u2h0zqZvbXFp+CxzZdeRn6ZNZGl1PwMzyqlZgVla0gk=";
+          vendorHash = "sha256-TRmAtXJwVL+rY6oszMU4aLxCV0SiKG4CT9ydKIO74zw=";
 
           subPackages = [ "cmd/gendb" ];
 
