@@ -38,7 +38,6 @@
         lib = pkgs.lib;
 
         # The Go vulnerability database.
-        # Version is based on the modified field of index/db.json in the archive.
         govulndb = pkgs.buildGoModule {
           pname = "govuln";
           version = "0-unstable-2025-02-18";
@@ -47,12 +46,26 @@
             owner = "golang";
             repo = "vulndb";
             rev = "dbe3f0cf88afa5f29bc18ce8c1ee6e63c1e59d76";
-            leaveDotGit = true;
             deepClone = true;
-            hash = "sha256-a/udZh50azrtBi4z9c2G4cN3/uzvTbJnt9quSuLq6m4=";
+            # Deep clone is needed as the vulndb is constructed from the repo metadata.
+            # However, .git isn't reproducible, mostly because of the unstable pack format.
+            # We unpack these files, eating the huge increase in disk usage.
+            # See https://github.com/NixOS/nixpkgs/issues/8567#issuecomment-133393592.
+            postFetch = ''
+              pushd $out
+              tmpdir=$(mktemp -d)
+              mv .git/objects/pack/*.pack $tmpdir
+              rm -r .git/objects/pack
+              rm .git/objects/info/packs
+              for pack in $tmpdir/*.pack; do
+                git unpack-objects < $pack
+              done
+              popd
+            '';
+            hash = "sha256-34w+RBN9LLDBWcoLJm52DsVjRDYNeeFCtvMoQq78EoY=";
           };
 
-          vendorHash = "sha256-u2h0zqZvbXFp+CxzZdeRn6ZNZGl1PwMzyqlZgVla0gk=";
+          vendorHash = "sha256-TRmAtXJwVL+rY6oszMU4aLxCV0SiKG4CT9ydKIO74zw=";
 
           subPackages = [ "cmd/gendb" ];
 
