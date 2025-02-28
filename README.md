@@ -11,11 +11,11 @@ allows easy access to the relevant part of the report.
 
 ```
 ❯ report-tool stats
-Packages discovered:   2341
-Packages failed:       409 (17%)
-Packages scanned:      1932 (82%)
-Packages vulnerable:   730 (37% of scanned)
-Total vulnerabilities: 2303
+Packages discovered:   2343
+Packages failed:       408 (17%)
+Packages scanned:      1935 (82%)
+Packages vulnerable:   744 (37% of scanned)
+Total vulnerabilities: 2342
 ```
 <p align="center">
     <img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRmIRrf8Xs-gWjELNtujQAGxQInZseqpnculzfNtulc6pTzJPnFuIJA3n1UxVwXC0YiGD-rjpS6qcbc/pubchart?oid=956312454&format=image" />
