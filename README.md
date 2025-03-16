@@ -22,6 +22,10 @@ Total vulnerabilities: 1822
     <img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRmIRrf8Xs-gWjELNtujQAGxQInZseqpnculzfNtulc6pTzJPnFuIJA3n1UxVwXC0YiGD-rjpS6qcbc/pubchart?oid=169772779&format=image" />
 </p>
 
+Reports for releases can be found on the release branches:
+
+- [24.11](https://github.com/katexochen/govulncheck-nixpkgs/tree/release-24.11)
+
 ### Current limitations
 
 - Primitive package discovery (see `isGoPkg`)
