@@ -40,12 +40,12 @@
         # The Go vulnerability database.
         govulndb = pkgs.buildGoModule {
           pname = "govuln";
-          version = "0-unstable-2025-02-18";
+          version = "0-unstable-2025-03-13";
 
           src = pkgs.fetchFromGitHub {
             owner = "golang";
             repo = "vulndb";
-            rev = "dbe3f0cf88afa5f29bc18ce8c1ee6e63c1e59d76";
+            rev = "fb7b899ce7dbd51033254c5766878c9714d6ca41";
             deepClone = true;
             # Deep clone is needed as the vulndb is constructed from the repo metadata.
             # However, .git isn't reproducible, mostly because of the unstable pack format.
@@ -62,10 +62,10 @@
               done
               popd
             '';
-            hash = "sha256-34w+RBN9LLDBWcoLJm52DsVjRDYNeeFCtvMoQq78EoY=";
+            hash = "sha256-pxzlcDgS1IionyKrhjQYEJUOQdzX1KjAWxn0QACxr0U=";
           };
 
-          vendorHash = "sha256-TRmAtXJwVL+rY6oszMU4aLxCV0SiKG4CT9ydKIO74zw=";
+          vendorHash = "sha256-bgmBBFiFdUKT9MQ6nHpVB1MJahaHD7W9CkZSwT1q6J8=";
 
           subPackages = [ "cmd/gendb" ];
 
